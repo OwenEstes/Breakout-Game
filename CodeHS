@@ -1,0 +1,231 @@
+<html>
+        <head>
+            <title>Your Program Title</title>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+            <script type="text/javascript" src="https://static.codehs.com/gulp/80550f5fc4071985bfef352d04f005ca3de931d3/chs-js-lib/chs.js"></script>
+            <style>
+                canvas {
+                    border: 1px solid 
+black;
+                    display: inline-block;
+                    vertical-align: top;
+                }
+                pre {
+                    border: 1px solid 
+black;
+                    display: inline-block;
+                    width: 400px;
+                    height: 500px;
+                    background-color: 
+#F5F5F5;
+                }
+            </style>
+    </head>
+    <body>
+        <h1>Your Program Title</h1>
+        <canvas
+        width="400"
+        height="500"
+        class="codehs-editor-canvas"></canvas>
+        <pre id="console"></pre>
+
+        <script>
+            window.onload = function() {
+                var NUM_ROWS = 8;
+var BRICK_TOP_OFFSET = 10;
+var BRICK_SPACING = 2;
+var NUM_BRICKS_PER_ROW = 10;
+var BRICK_HEIGHT = 10;
+var SPACE_FOR_BRICKS = getWidth() - (NUM_BRICKS_PER_ROW + 1) * BRICK_SPACING;
+var BRICK_WIDTH = SPACE_FOR_BRICKS / NUM_BRICKS_PER_ROW;
+var BRICK_COLOR = 1;
+var NUM_TOTAL_BRICKS = 0;
+var brick;
+var CURRENT_ROW = 1;
+var brickX = 0 + BRICK_SPACING;
+var brickY = 0 + BRICK_TOP_OFFSET;
+var PADDLE_WIDTH = 80;
+var PADDLE_HEIGHT = 15;
+var PADDLE_OFFSET = 10;
+var winCheck = 75;
+//ball size
+var BALL_RADIUS = 15;
+var ball;
+var dx= 5;
+var dy = 5;
+var elem;
+function start(){
+makeRows();
+
+paddle();
+mouseMoveMethod(movePaddle);
+ball();
+
+setTimer(movement,20);
+
+keyDownMethod(resummonPaddle);
+
+}
+//for an extra challenge you have to summon back the paddle if you
+//want to use it
+function resummonPaddle(e){
+if(e.keyCode == Keyboard.DOWN){
+paddle= new Rectangle(PADDLE_WIDTH, PADDLE_HEIGHT);
+
+paddle.setPosition(getWidth()/2 - PADDLE_WIDTH/2, getHeight()- PADDLE_HEIGHT- PADDLE_OFFSET);
+add(paddle);
+}
+}
+function makeRows(){
+
+while(NUM_TOTAL_BRICKS < NUM_BRICKS_PER_ROW){
+brick = new Rectangle(BRICK_WIDTH, BRICK_HEIGHT);
+brick.setPosition(brickX, brickY);
+
+//colooors
+if(BRICK_COLOR == 1 || BRICK_COLOR == 2){
+brick.setColor(Color.red);
+}else if(BRICK_COLOR == 3 || BRICK_COLOR == 4){
+brick.setColor(Color.orange);
+}else if(BRICK_COLOR == 5 || BRICK_COLOR == 6){
+brick.setColor(Color.green);
+}else if(BRICK_COLOR == 7 || BRICK_COLOR == 8){
+brick.setColor(Color.blue);
+}
+
+
+add(brick);
+brickX += BRICK_WIDTH + BRICK_SPACING;
+NUM_TOTAL_BRICKS++;
+
+
+
+if(NUM_TOTAL_BRICKS >= NUM_BRICKS_PER_ROW && CURRENT_ROW != NUM_ROWS){
+
+brickY += BRICK_HEIGHT + BRICK_SPACING;
+brickX = 0 + BRICK_SPACING;
+CURRENT_ROW++;
+BRICK_COLOR++;
+NUM_TOTAL_BRICKS = 0;
+}
+
+
+
+}
+
+
+
+}
+function ball(){
+
+ball = new Circle(BALL_RADIUS);
+ball.setPosition(getWidth()/2, getHeight()/2);
+add(ball);
+}
+function paddle(){
+paddle= new Rectangle(PADDLE_WIDTH, PADDLE_HEIGHT);
+
+paddle.setPosition(getWidth()/2 - PADDLE_WIDTH/2, getHeight()- PADDLE_HEIGHT- PADDLE_OFFSET);
+add(paddle);
+
+}
+function movePaddle(e){
+paddle.setPosition(e.getX() - PADDLE_WIDTH/ 2, getHeight() -PADDLE_OFFSET - PADDLE_HEIGHT);
+
+if(e.getX()<= PADDLE_WIDTH/2){
+paddle.setPosition(0,getHeight() - PADDLE_HEIGHT- PADDLE_OFFSET);
+}else if(e.getX()>= getWidth()- PADDLE_WIDTH/2){
+paddle.setPosition(getWidth()-PADDLE_WIDTH,getHeight()- PADDLE_HEIGHT-PADDLE_OFFSET);
+}
+
+}
+function movement(){
+var elem = getElementAt(ball.getX(), ball.getY());
+hitBrick();
+ball.move(dx,dy);
+wallBounce();
+if(winCheck <=0){
+
+removeAll();
+var txt = new Text ("You won!", "35pt Comic Sans");
+txt.setPosition(getWidth()/2-txt.getWidth()/2, getHeight()/2 + txt.getHeight()/2);
+add(txt);
+}
+}
+function wallBounce(){
+
+//right
+if(ball.getX() + ball.getRadius() > getWidth()){
+dx = -dx;
+}
+
+//left
+if(ball.getX() - ball.getRadius()< 0){
+dx= -dx;
+}
+
+//bottom
+if(ball.getY() + ball.getRadius() > getHeight()){
+dy= -dy;
+}
+
+//top
+if(ball.getY() - ball.getRadius()< 0){
+dy= -dy;
+}
+
+
+
+}
+function hitBrick(){
+if(ball.getY() - BALL_RADIUS 3 <= NUM_ROWS BRICK_HEIGHT){
+//top
+elem = getElementAt (ball.getX(), ball.getY() - ball.getRadius());
+if(elem!= null){
+ball.setColor(elem.getColor());
+dy = -dy;
+remove(elem);
+winCheck--;
+}
+}
+//right
+elem = getElementAt(ball.getX() + ball.getRadius(), ball.getY());
+if(elem!= null){
+ball.setColor(elem.getColor());
+dx = -dx;
+remove(elem);
+winCheck--;
+
+}
+
+
+//left
+
+elem = getElementAt(ball.getX() - ball.getRadius(), ball.getY());
+if(elem!= null){
+ball.setColor(elem.getColor());
+dx = -dx;
+remove(elem);
+winCheck--;
+
+}
+
+//bottom
+
+elem = getElementAt(ball.getX(), ball.getY() + ball.getRadius());
+if(elem!= null){
+ball.setColor(elem.getColor());
+dy = -dy;
+remove(elem);
+winCheck--;
+
+}
+
+}
+                if (typeof start === 'function') {
+                    start();
+                }
+            };
+        </script>
+    </body>
+</html>
